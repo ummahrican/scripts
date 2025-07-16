@@ -1,0 +1,22 @@
+{
+  "site": {
+    "title": "Google Sheets Data Archive - UC Berkeley MELC",
+    "organization": "UC Berkeley",
+    "department": "Middle Eastern Languages and Cultures",
+    "pageTitle": "Google Sheets Data Archive TEST",
+    "pageSubtitle": "Digital humanities tool for displaying and analyzing structured data from Google Sheets"
+  },
+  "dataSource": {
+    "name": "Middle Persian Documents Archive",
+    "description": "This digital archive displays data from the Middle Persian Documents collection. The data is automatically loaded from the source spreadsheet and updated in real-time."
+  },
+  "academicNote": "This tool is designed for digital humanities research and educational purposes. It supports the analysis and visualization of structured data commonly used in academic research projects.",
+  "footer": {
+    "organization": "University of California, Berkeley",
+    "department": "Middle Eastern Languages and Cultures \u2022 Digital Humanities Tools"
+  },
+  "technical": {
+    "sheetId": "<SHEET_ID>",
+    "gid": "<GID>"
+  }
+}
