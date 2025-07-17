@@ -3,17 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Google Sheets Data Archive - UC Berkeley MELC</title>
-    
-    <!-- Tailwind CSS from CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom CSS for specific styling -->
+    <title>Open Archive of Middle Persian Documents</title>
     <style>
-        /* Custom spinner animation */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #000;
+            background-color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Header */
+        .header {
+            background-color: #000;
+            color: #fff;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+        
+        .header-separator {
+            margin: 0 0.75rem;
+            color: #F3DFB8;
+        }
+        
+        /* Main content */
+        .main {
+            padding: 2rem 0;
+        }
+        
+        .page-title {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            color: #000;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-title p {
+            font-size: 1.125rem;
+            color: #000;
+            opacity: 0.8;
+        }
+        
+        /* Input section */
+        .input-section {
+            background-color: #F3DFB8;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .input-section h2 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .form-input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #999;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #333;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .note {
+            font-size: 0.875rem;
+            color: #000;
+            opacity: 0.8;
+        }
+        
+        /* Error */
+        .error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .error-text {
+            color: #dc2626;
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 0;
         }
         
         .spinner {
@@ -23,93 +170,295 @@
             border-top: 2px solid #000;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-right: 0.75rem;
         }
         
-        /* Custom color for UC Berkeley theme */
-        .bg-berkeley-gold {
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Search and controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #999;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+        
+        .items-per-page {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .items-select {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #999;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding: 1rem 1.5rem;
+            background-color: #F3DFB8;
+            border-top: 1px solid #999;
+        }
+        
+        .pagination-info {
+            font-size: 0.875rem;
+            color: #000;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .pagination-btn {
+            padding: 0.25rem 0.75rem;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .pagination-btn:hover {
+            background-color: #333;
+        }
+        
+        .pagination-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .page-input {
+            width: 60px;
+            padding: 0.25rem;
+            border: 1px solid #999;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+        .table-container {
+            background-color: #fff;
+            border: 1px solid #999;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background-color: #F3DFB8;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #999;
+        }
+        
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #000;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table thead {
             background-color: #F3DFB8;
         }
         
-        .border-berkeley-gold {
-            border-color: #F3DFB8;
+        .table th {
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-right: 1px solid #ccc;
         }
         
-        .text-berkeley-gold {
-            color: #F3DFB8;
+        .table th:last-child {
+            border-right: none;
         }
         
-        /* Table hover effect */
+        .table td {
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            color: #000;
+            border-right: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .table td:last-child {
+            border-right: none;
+        }
+        
         .table tbody tr:hover {
             background-color: #f9f9f9;
         }
         
-        /* Cell content with ellipsis */
         .cell-content {
             max-width: 300px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        
+        /* Instructions */
+        .instructions {
+            background-color: #F3DFB8;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+        
+        .instructions h3 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+        
+        .instructions ol {
+            list-style: decimal;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .instructions li {
+            font-size: 0.875rem;
+            color: #000;
+            margin-bottom: 0.5rem;
+        }
+        
+        .instructions-note {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            color: #000;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 4rem;
+            background-color: #000;
+            color: #fff;
+            border-top: 4px solid #F3DFB8;
+            padding: 1.5rem 0;
+        }
+        
+        .footer-content {
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        .footer-accent {
+            color: #F3DFB8;
+        }
+        
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
-<body class="font-sans leading-relaxed text-black bg-white">
+<body>
     <!-- Header -->
-    <header class="bg-black text-white py-4 shadow-md">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex items-center">
-                <div id="header-organization" class="text-lg font-medium">UC Berkeley</div>
-                <div class="mx-3 text-berkeley-gold">|</div>
-                <div id="header-department" class="text-lg font-medium">Middle Eastern Languages and Cultures</div>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-title">UC Berkeley</div>
+                <div class="header-separator">|</div>
+                <div class="header-title">Middle Eastern Languages and Cultures</div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="py-8">
-        <div class="max-w-6xl mx-auto px-4">
+    <main class="main">
+        <div class="container">
             <!-- Page Title -->
-            <div class="mb-8">
-                <h1 id="main-title" class="text-3xl font-light text-black mb-2">Google Sheets Data Archive</h1>
-                <p id="main-subtitle" class="text-lg text-black opacity-80">Digital humanities tool for displaying and analyzing structured data from Google Sheets</p>
+            <div class="page-title">
+                <h1>Open Archive of Middle Persian Documents: Database of Middle Persian Documents</h1>
+                <p style="margin-bottom: 1rem;">This page shows selected information from the database of all known Middle Persian documents compiled as part of the <a href="https://mp.melc.berkeley.edu" target="_blank">Open Archive of Middle Persian Documents</a> project.</p>
+                <p style="margin-bottom: 1rem;">Notes: The 'corpus numbers' are numbers assigned to documents by OpenAMPD so that each document has a unique identifier. This is because documents are often published using an informal 'siglum' (or none at all), which may be ambiguous or repetitive. Holding institutions have various 'shelf', 'inventory', 'accession' (etc.) numbers, which are listed where known; private collections typically do not. An effort has been made to find all instances where the image of a document was published separately from a text edition; hence why there is a separate column for that information.</p>
+                <p style="margin-bottom: 1rem;">The database was compiled by <a href="https://www.ocf.berkeley.edu/~abenkato/">Adam Benkato</a> (UC Berkeley). This page was developed by <a href="https://seenwebdev.com">Seen Web Developers</a>.</p>
             </div>
 
             <!-- Data Source Info -->
-            <div class="bg-berkeley-gold border border-gray-300 rounded-lg p-6 mb-8">
-                <h2 class="text-xl font-medium text-black mb-4">Data Source</h2>
-                <div class="text-sm text-black">
-                    <strong>Source:</strong> <span id="data-source-name">Middle Persian Documents Archive</span>
-                    <br><strong>Last Updated:</strong> <span id="last-updated">Loading...</span>
-                    <button id="refresh-btn" class="ml-4 px-3 py-1 bg-black text-white border-none rounded text-xs font-medium cursor-pointer hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed">Refresh Data</button>
+            <div class="input-section">
+                <h2>Data Source</h2>
+                <div class="note">
+                    <strong>Source:</strong>Middle Persian Documents Database, A. Benkato, last updated June 2025.
+                    <br><strong>This Page Last Updated:</strong> <span id="last-updated">Loading...</span>
+                    <button id="refresh-btn" class="btn" style="margin-left: 1rem; padding: 0.25rem 0.75rem; font-size: 0.75rem;">Refresh Data</button>
                 </div>
             </div>
 
             <!-- Error Display -->
-            <div id="error-container" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <div class="text-red-600">
+            <div id="error-container" class="error hidden">
+                <div class="error-text">
                     <strong>Error:</strong> <span id="error-message"></span>
                 </div>
             </div>
 
             <!-- Loading State -->
-            <div id="loading-container" class="hidden flex items-center justify-center py-12">
-                <div class="spinner mr-3"></div>
+            <div id="loading-container" class="loading hidden">
+                <div class="spinner"></div>
                 <span>Loading data...</span>
             </div>
 
             <!-- Data Table -->
-            <div id="table-container" class="hidden bg-white border border-gray-400 rounded-lg overflow-hidden">
-                <div class="bg-berkeley-gold px-6 py-4 border-b border-gray-400">
-                    <h3 class="text-lg font-medium text-black">Data Archive (<span id="record-count">0</span> records, <span id="filtered-count">0</span> shown)</h3>
+            <div id="table-container" class="table-container hidden">
+                <div class="table-header">
+                    <h3 class="table-title">Middle Persian Documents (<span id="record-count">0</span> records, <span id="filtered-count">0</span> shown)</h3>
                 </div>
                 
                 <!-- Search and Controls -->
-                <div class="flex justify-between items-center px-6 py-4 border-b border-gray-400 gap-4 flex-wrap">
-                    <div class="flex-1 min-w-64">
-                        <input type="text" id="search-input" class="w-full px-3 py-2 border border-gray-400 rounded text-sm focus:outline-none focus:border-black focus:shadow-sm" placeholder="Search all columns...">
+                <div class="controls" style="padding: 1rem 1.5rem; border-bottom: 1px solid #999;">
+                    <div class="search-box">
+                        <input type="text" id="search-input" class="search-input" placeholder="Search all columns...">
                     </div>
-                    <div class="flex items-center gap-2 text-sm">
+                    <div class="items-per-page">
                         <label for="items-select">Show:</label>
-                        <select id="items-select" class="px-2 py-1 border border-gray-400 rounded text-sm">
+                        <select id="items-select" class="items-select">
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
@@ -120,412 +469,338 @@
                     </div>
                 </div>
                 
-                <div class="overflow-x-auto">
-                    <table class="w-full border-collapse table" id="data-table">
-                        <thead id="table-head" class="bg-berkeley-gold"></thead>
+                <div class="table-wrapper">
+                    <table class="table" id="data-table">
+                        <thead id="table-head"></thead>
                         <tbody id="table-body"></tbody>
                     </table>
                 </div>
                 
                 <!-- Pagination -->
-                <div id="pagination" class="flex justify-between items-center mt-4 px-6 py-4 bg-berkeley-gold border-t border-gray-400">
-                    <div class="text-sm text-black">
+                <div id="pagination" class="pagination">
+                    <div class="pagination-info">
                         Showing <span id="showing-start">1</span> to <span id="showing-end">25</span> of <span id="total-filtered">0</span> entries
                     </div>
-                    <div class="flex gap-2 items-center">
-                        <button id="first-btn" class="px-3 py-1 bg-black text-white border-none rounded text-sm cursor-pointer hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed">First</button>
-                        <button id="prev-btn" class="px-3 py-1 bg-black text-white border-none rounded text-sm cursor-pointer hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed">Previous</button>
-                        <span class="flex items-center gap-2 text-sm">
-                            Page <input type="number" id="page-input" class="w-15 px-1 py-1 border border-gray-400 rounded text-sm text-center" min="1" value="1"> of <span id="total-pages">1</span>
+                    <div class="pagination-controls">
+                        <button id="first-btn" class="pagination-btn">First</button>
+                        <button id="prev-btn" class="pagination-btn">Previous</button>
+                        <span style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                            Page <input type="number" id="page-input" class="page-input" min="1" value="1"> of <span id="total-pages">1</span>
                         </span>
-                        <button id="next-btn" class="px-3 py-1 bg-black text-white border-none rounded text-sm cursor-pointer hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed">Next</button>
-                        <button id="last-btn" class="px-3 py-1 bg-black text-white border-none rounded text-sm cursor-pointer hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed">Last</button>
+                        <button id="next-btn" class="pagination-btn">Next</button>
+                        <button id="last-btn" class="pagination-btn">Last</button>
                     </div>
                 </div>
             </div>
 
             <!-- Instructions -->
-            <div id="instructions" class="bg-berkeley-gold border border-gray-300 rounded-lg p-6">
-                <h3 class="text-lg font-medium text-black mb-4">About This Archive</h3>
-                <p id="instructions-description" class="text-sm text-black mb-4">
-                    This digital archive displays data from the Middle Persian Documents collection. 
-                    The data is automatically loaded from the source spreadsheet and updated in real-time.
+            <div id="instructions" class="instructions">
+                <h3>About This Page</h3>
+                <p style="font-size: 0.875rem; color: #000; margin-bottom: 1rem;">
+                    This page displays data from the Database of Middle Persian Documents. The data is automatically loaded from the source spreadsheet and updated in real-time.
                 </p>
-                <div class="mt-4 p-3 bg-black bg-opacity-10 rounded text-sm text-black">
-                    <strong>Academic Use:</strong> <span id="academic-note">This tool is designed for digital humanities research and educational purposes. 
-                    It supports the analysis and visualization of structured data commonly used in academic research projects.</span>
+                <div class="instructions-note">
+                    <strong>Academic Use:</strong> This tool is designed for digital humanities research and educational purposes. It supports the analysis and visualization of structured data commonly used in academic research projects. This page uses <a href="https://datatables.net/">DataTables</a>.
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="mt-16 bg-black text-white border-t-4 border-berkeley-gold py-6">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="text-center text-sm">
-                <div id="footer-organization">University of California, Berkeley</div>
-                <div id="footer-department" class="text-berkeley-gold">Middle Eastern Languages and Cultures • Digital Humanities Tools</div>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>University of California, Berkeley</div>
+                <div class="footer-accent">Open Archive of Middle Persian Documents</div>
             </div>
         </div>
     </footer>
-
     <script>
-        // Configuration will be loaded from config.json
-        let config = {};
+	// Hardcoded sheet ID for your specific Google Sheet
+    const SHEET_ID = '1bICU4kTTZR6nSPOrBhAGeZhmayHoldvHxAIME0IYS5w';
+    const GID = '2109706943'; // Specific sheet tab
+    
+    // State variables
+    let data = [];
+    let filteredData = [];
+    let currentPage = 1;
+    let itemsPerPage = 'all';
+    let loading = false;
+    let error = '';
+
+    // DOM elements
+    const refreshBtn = document.getElementById('refresh-btn');
+    const lastUpdated = document.getElementById('last-updated');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+    const loadingContainer = document.getElementById('loading-container');
+    const tableContainer = document.getElementById('table-container');
+    const instructionsContainer = document.getElementById('instructions');
+    const recordCount = document.getElementById('record-count');
+    const filteredCount = document.getElementById('filtered-count');
+    const tableHead = document.getElementById('table-head');
+    const tableBody = document.getElementById('table-body');
+    
+    // Search and pagination elements
+    const searchInput = document.getElementById('search-input');
+    const itemsSelect = document.getElementById('items-select');
+    const pagination = document.getElementById('pagination');
+    const showingStart = document.getElementById('showing-start');
+    const showingEnd = document.getElementById('showing-end');
+    const totalFiltered = document.getElementById('total-filtered');
+    const pageInput = document.getElementById('page-input');
+    const totalPages = document.getElementById('total-pages');
+    const firstBtn = document.getElementById('first-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const lastBtn = document.getElementById('last-btn');
+
+    // Show/hide elements
+    function showElement(element) {
+        element.classList.remove('hidden');
+    }
+
+    function hideElement(element) {
+        element.classList.add('hidden');
+    }
+
+    // Set loading state
+    function setLoading(isLoading) {
+        loading = isLoading;
+        refreshBtn.disabled = isLoading;
+        refreshBtn.textContent = isLoading ? 'Loading...' : 'Refresh Data';
         
-        // Default fallback values (used if config.json fails to load)
-        const defaultConfig = {
-            site: {
-                title: "Google Sheets Data Archive - UC Berkeley MELC",
-                organization: "UC Berkeley",
-                department: "Middle Eastern Languages and Cultures",
-                pageTitle: "Google Sheets Data Archive",
-                pageSubtitle: "Digital humanities tool for displaying and analyzing structured data from Google Sheets"
-            },
-            dataSource: {
-                name: "Middle Persian Documents Archive",
-                description: "This digital archive displays data from the Middle Persian Documents collection. The data is automatically loaded from the source spreadsheet and updated in real-time."
-            },
-            academicNote: "This tool is designed for digital humanities research and educational purposes. It supports the analysis and visualization of structured data commonly used in academic research projects.",
-            footer: {
-                organization: "University of California, Berkeley",
-                department: "Middle Eastern Languages and Cultures • Digital Humanities Tools"
-            },
-            technical: {
-                sheetId: "<SHEET_ID>",
-                gid: "<GID>"
-            }
-        };
-        
-        // State variables
-        let data = [];
-        let filteredData = [];
-        let currentPage = 1;
-        let itemsPerPage = 'all';
-        let loading = false;
-        let error = '';
-
-        // DOM elements
-        const refreshBtn = document.getElementById('refresh-btn');
-        const lastUpdated = document.getElementById('last-updated');
-        const errorContainer = document.getElementById('error-container');
-        const errorMessage = document.getElementById('error-message');
-        const loadingContainer = document.getElementById('loading-container');
-        const tableContainer = document.getElementById('table-container');
-        const instructionsContainer = document.getElementById('instructions');
-        const recordCount = document.getElementById('record-count');
-        const filteredCount = document.getElementById('filtered-count');
-        const tableHead = document.getElementById('table-head');
-        const tableBody = document.getElementById('table-body');
-        
-        // Search and pagination elements
-        const searchInput = document.getElementById('search-input');
-        const itemsSelect = document.getElementById('items-select');
-        const pagination = document.getElementById('pagination');
-        const showingStart = document.getElementById('showing-start');
-        const showingEnd = document.getElementById('showing-end');
-        const totalFiltered = document.getElementById('total-filtered');
-        const pageInput = document.getElementById('page-input');
-        const totalPages = document.getElementById('total-pages');
-        const firstBtn = document.getElementById('first-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const lastBtn = document.getElementById('last-btn');
-
-        // Load configuration from config.json
-        async function loadConfig() {
-            try {
-                const response = await fetch('config.json');
-                if (response.ok) {
-                    config = await response.json();
-                } else {
-                    console.warn('Could not load config.json, using defaults');
-                    config = defaultConfig;
-                }
-            } catch (err) {
-                console.warn('Error loading config.json:', err, 'Using defaults');
-                config = defaultConfig;
-            }
-            
-            // Apply configuration to page elements
-            applyConfig();
-        }
-
-        // Apply configuration to page elements
-        function applyConfig() {
-            // Update page title
-            document.title = config.site.title;
-            document.getElementById('page-title').textContent = config.site.title;
-            
-            // Update header
-            document.getElementById('header-organization').textContent = config.site.organization;
-            document.getElementById('header-department').textContent = config.site.department;
-            
-            // Update main content
-            document.getElementById('main-title').textContent = config.site.pageTitle;
-            document.getElementById('main-subtitle').textContent = config.site.pageSubtitle;
-            
-            // Update data source info
-            document.getElementById('data-source-name').textContent = config.dataSource.name;
-            
-            // Update instructions
-            document.getElementById('instructions-description').textContent = config.dataSource.description;
-            document.getElementById('academic-note').textContent = config.academicNote;
-            
-            // Update footer
-            document.getElementById('footer-organization').textContent = config.footer.organization;
-            document.getElementById('footer-department').textContent = config.footer.department;
-        }
-
-        // Show/hide elements
-        function showElement(element) {
-            element.classList.remove('hidden');
-        }
-
-        function hideElement(element) {
-            element.classList.add('hidden');
-        }
-
-        // Set loading state
-        function setLoading(isLoading) {
-            loading = isLoading;
-            refreshBtn.disabled = isLoading;
-            refreshBtn.textContent = isLoading ? 'Loading...' : 'Refresh Data';
-            
-            if (isLoading) {
-                showElement(loadingContainer);
-            } else {
-                hideElement(loadingContainer);
-            }
-        }
-
-        // Show error
-        function showError(message) {
-            error = message;
-            errorMessage.textContent = message;
-            showElement(errorContainer);
-        }
-
-        // Hide error
-        function hideError() {
-            error = '';
-            hideElement(errorContainer);
-        }
-
-        // Update last updated time
-        function updateLastUpdated() {
-            const now = new Date();
-            lastUpdated.textContent = now.toLocaleString();
-        }
-
-        // Filter data based on search
-        function filterData() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                filteredData = [...data];
-            } else {
-                filteredData = data.filter(row => {
-                    return Object.values(row).some(value => 
-                        value && value.toString().toLowerCase().includes(searchTerm)
-                    );
-                });
-            }
-            
-            currentPage = 1;
-            updatePagination();
-            renderTable();
-        }
-
-        // Initialize filtered data (call this when data first loads)
-        function initializeData() {
-            filteredData = [...data];
-            currentPage = 1;
-            updatePagination();
-            renderTable();
-        }
-
-        // Update pagination info
-        function updatePagination() {
-            const totalItems = filteredData.length;
-            const totalPageCount = itemsPerPage === 'all' ? 1 : Math.ceil(totalItems / itemsPerPage);
-            
-            // Update counts
-            filteredCount.textContent = totalItems;
-            totalFiltered.textContent = totalItems;
-            totalPages.textContent = totalPageCount;
-            pageInput.value = currentPage;
-            pageInput.max = totalPageCount;
-            
-            // Calculate showing range
-            if (itemsPerPage === 'all') {
-                showingStart.textContent = totalItems > 0 ? 1 : 0;
-                showingEnd.textContent = totalItems;
-            } else {
-                const start = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
-                const end = Math.min(currentPage * itemsPerPage, totalItems);
-                showingStart.textContent = start;
-                showingEnd.textContent = end;
-            }
-            
-            // Update button states
-            firstBtn.disabled = currentPage <= 1;
-            prevBtn.disabled = currentPage <= 1;
-            nextBtn.disabled = currentPage >= totalPageCount;
-            lastBtn.disabled = currentPage >= totalPageCount;
-            
-            // Show/hide pagination
-            if (totalItems === 0 || itemsPerPage === 'all') {
-                hideElement(pagination);
-            } else {
-                showElement(pagination);
-            }
-        }
-
-        // Get current page data
-        function getCurrentPageData() {
-            if (itemsPerPage === 'all') {
-                return filteredData;
-            }
-            
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            return filteredData.slice(start, end);
-        }
-
-        // Render table
-        function renderTable() {
-            const pageData = getCurrentPageData();
-            
-            if (data.length === 0) {
-                showElement(instructionsContainer);
-                hideElement(tableContainer);
-                return;
-            }
-            
-            if (pageData.length === 0 && filteredData.length === 0) {
-                // No search results
-                tableBody.innerHTML = '<tr><td colspan="100%" class="text-center py-8 text-gray-500">No results found</td></tr>';
-                updatePagination();
-                return;
-            }
-
-            // Create table header (only if we have data)
-            if (data.length > 0) {
-                const headers = Object.keys(data[0]);
-                tableHead.innerHTML = `
-                    <tr>
-                        ${headers.map(header => `<th class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-r border-gray-300 last:border-r-0">${header}</th>`).join('')}
-                    </tr>
-                `;
-            }
-
-            // Create table body
-            if (pageData.length > 0) {
-                tableBody.innerHTML = pageData.map(row => `
-                    <tr class="hover:bg-gray-50">
-                        ${Object.values(row).map(value => `
-                            <td class="px-6 py-4 text-sm text-black border-r border-gray-200 border-b border-gray-200 last:border-r-0">
-                                <div class="cell-content" title="${value || ''}">${value || '—'}</div>
-                            </td>
-                        `).join('')}
-                    </tr>
-                `).join('');
-            } else {
-                tableBody.innerHTML = '<tr><td colspan="100%" class="text-center py-8 text-gray-500">No data available</td></tr>';
-            }
-
-            showElement(tableContainer);
-            hideElement(instructionsContainer);
-            updatePagination();
-        }
-
-        // Pagination event handlers
-        function goToPage(page) {
-            const totalPageCount = Math.ceil(filteredData.length / itemsPerPage);
-            currentPage = Math.max(1, Math.min(page, totalPageCount));
-            renderTable();
-        }
-
-        // Fetch data from your PHP API
-        async function fetchSheetData() {
-            setLoading(true);
-            hideError();
-            
-            try {
-                // Call your PHP API
-                const response = await fetch('/api/sheet-data.php');
-                
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                
-                if (!result.success) {
-                    throw new Error(result.message || 'Failed to fetch data from API');
-                }
-                
-                data = result.data;
-                recordCount.textContent = data.length;
-                initializeData(); // Use this instead of filterData() on initial load
-                
-                // Update last updated time
-                if (result.lastUpdated) {
-                    const updateTime = new Date(result.lastUpdated);
-                    lastUpdated.textContent = updateTime.toLocaleString();
-                } else {
-                    updateLastUpdated();
-                }
-                
-                console.log(`Loaded ${result.recordCount} records (cached: ${result.cached})`);
-                
-            } catch (err) {
-                console.error('Fetch error:', err);
-                showError(err.message || 'Failed to load data. Please try again.');
-                hideElement(tableContainer);
-                showElement(instructionsContainer);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        // Event listeners
-        refreshBtn.addEventListener('click', fetchSheetData);
-        
-        searchInput.addEventListener('input', filterData);
-        
-        itemsSelect.addEventListener('change', function() {
-            itemsPerPage = this.value === 'all' ? 'all' : parseInt(this.value);
-            currentPage = 1;
-            renderTable();
-        });
-        
-        pageInput.addEventListener('change', function() {
-            goToPage(parseInt(this.value));
-        });
-        
-        firstBtn.addEventListener('click', () => goToPage(1));
-        prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
-        nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
-        lastBtn.addEventListener('click', () => {
-            const totalPageCount = Math.ceil(filteredData.length / itemsPerPage);
-            goToPage(totalPageCount);
-        });
-
-        // Initialize - load configuration and data when page loads
-        document.addEventListener('DOMContentLoaded', async function() {
-            hideElement(errorContainer);
+        if (isLoading) {
+            showElement(loadingContainer);
+        } else {
             hideElement(loadingContainer);
-            hideElement(tableContainer);
+        }
+    }
+
+    // Show error
+    function showError(message) {
+        error = message;
+        errorMessage.textContent = message;
+        showElement(errorContainer);
+    }
+
+    // Hide error
+    function hideError() {
+        error = '';
+        hideElement(errorContainer);
+    }
+
+    // Update last updated time
+    function updateLastUpdated() {
+        const now = new Date();
+        lastUpdated.textContent = now.toLocaleString();
+    }
+
+    // Filter data based on search
+    function filterData() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        if (!searchTerm) {
+            filteredData = [...data];
+        } else {
+            filteredData = data.filter(row => {
+                return Object.values(row).some(value => 
+                    value && value.toString().toLowerCase().includes(searchTerm)
+                );
+            });
+        }
+        
+        currentPage = 1;
+        updatePagination();
+        renderTable();
+    }
+
+    // Initialize filtered data (call this when data first loads)
+    function initializeData() {
+        filteredData = [...data];
+        currentPage = 1;
+        updatePagination();
+        renderTable();
+    }
+
+    // Update pagination info
+    function updatePagination() {
+        const totalItems = filteredData.length;
+        const totalPageCount = itemsPerPage === 'all' ? 1 : Math.ceil(totalItems / itemsPerPage);
+        
+        // Update counts
+        filteredCount.textContent = totalItems;
+        totalFiltered.textContent = totalItems;
+        totalPages.textContent = totalPageCount;
+        pageInput.value = currentPage;
+        pageInput.max = totalPageCount;
+        
+        // Calculate showing range
+        if (itemsPerPage === 'all') {
+            showingStart.textContent = totalItems > 0 ? 1 : 0;
+            showingEnd.textContent = totalItems;
+        } else {
+            const start = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+            const end = Math.min(currentPage * itemsPerPage, totalItems);
+            showingStart.textContent = start;
+            showingEnd.textContent = end;
+        }
+        
+        // Update button states
+        firstBtn.disabled = currentPage <= 1;
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPageCount;
+        lastBtn.disabled = currentPage >= totalPageCount;
+        
+        // Show/hide pagination
+        if (totalItems === 0 || itemsPerPage === 'all') {
             hideElement(pagination);
+        } else {
+            showElement(pagination);
+        }
+    }
+
+    // Get current page data
+    function getCurrentPageData() {
+        if (itemsPerPage === 'all') {
+            return filteredData;
+        }
+        
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        return filteredData.slice(start, end);
+    }
+
+    // Render table
+    function renderTable() {
+        const pageData = getCurrentPageData();
+        
+        if (data.length === 0) {
+            showElement(instructionsContainer);
+            hideElement(tableContainer);
+            return;
+        }
+        
+        if (pageData.length === 0 && filteredData.length === 0) {
+            // No search results
+            tableBody.innerHTML = '<tr><td colspan="100%" style="text-align: center; padding: 2rem; color: #666;">No results found</td></tr>';
+            updatePagination();
+            return;
+        }
+
+        // Create table header (only if we have data)
+        if (data.length > 0) {
+            const headers = Object.keys(data[0]);
+            tableHead.innerHTML = `
+                <tr>
+                    ${headers.map(header => `<th>${header}</th>`).join('')}
+                </tr>
+            `;
+        }
+
+        // Create table body
+        if (pageData.length > 0) {
+            tableBody.innerHTML = pageData.map(row => `
+                <tr>
+                    ${Object.values(row).map(value => `
+                        <td>
+                            <div class="cell-content" title="${value || ''}">${value || 'â€”'}</div>
+                        </td>
+                    `).join('')}
+                </tr>
+            `).join('');
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="100%" style="text-align: center; padding: 2rem; color: #666;">No data available</td></tr>';
+        }
+
+        showElement(tableContainer);
+        hideElement(instructionsContainer);
+        updatePagination();
+    }
+
+    // Pagination event handlers
+    function goToPage(page) {
+        const totalPageCount = Math.ceil(filteredData.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(page, totalPageCount));
+        renderTable();
+    }
+
+    // Fetch data from your PHP API
+    async function fetchSheetData() {
+        setLoading(true);
+        hideError();
+        
+        try {
+            // Call your PHP API
+            const response = await fetch('/api/sheet-data.php');
             
-            // Load configuration first
-            await loadConfig();
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
             
-            // Then auto-load the data
-            fetchSheetData();
-        });
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to fetch data from API');
+            }
+            
+            data = result.data;
+            recordCount.textContent = data.length;
+            initializeData(); // Use this instead of filterData() on initial load
+            
+            // Update last updated time
+            if (result.lastUpdated) {
+                const updateTime = new Date(result.lastUpdated);
+                lastUpdated.textContent = updateTime.toLocaleString();
+            } else {
+                updateLastUpdated();
+            }
+            
+            console.log(`Loaded ${result.recordCount} records (cached: ${result.cached})`);
+            
+        } catch (err) {
+            console.error('Fetch error:', err);
+            showError(err.message || 'Failed to load data. Please try again.');
+            hideElement(tableContainer);
+            showElement(instructionsContainer);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // Event listeners
+    refreshBtn.addEventListener('click', fetchSheetData);
+    
+    searchInput.addEventListener('input', filterData);
+    
+    itemsSelect.addEventListener('change', function() {
+        itemsPerPage = this.value === 'all' ? 'all' : parseInt(this.value);
+        currentPage = 1;
+        renderTable();
+    });
+    
+    pageInput.addEventListener('change', function() {
+        goToPage(parseInt(this.value));
+    });
+    
+    firstBtn.addEventListener('click', () => goToPage(1));
+    prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
+    nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
+    lastBtn.addEventListener('click', () => {
+        const totalPageCount = Math.ceil(filteredData.length / itemsPerPage);
+        goToPage(totalPageCount);
+    });
+
+    // Initialize - load data immediately when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        hideElement(errorContainer);
+        hideElement(loadingContainer);
+        hideElement(tableContainer);
+        hideElement(pagination);
+        
+        // Auto-load the data
+        fetchSheetData();
+    });
     </script>
 </body>
 </html>
