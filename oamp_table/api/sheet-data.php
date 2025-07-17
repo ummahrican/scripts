@@ -125,7 +125,7 @@ function fetchSheetData($sheet_id, $sheet_name, $service_account_file) {
     $result = [];
     
     // Define which columns to include (0-indexed: A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7, K=10, M=12, R=17, S=18, Y=24)
-    $allowed_columns = [0, 1, 2, 3, 4, 5, 6, 7, 10, 12, 17, 18, 24]; // A, B, C, D, E, F, G, H, K, M, R, S, Y
+    $allowed_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 14, 15, 16]; // A, B, C, D, E, F, G, H, I, O, P, Q
     
     foreach ($values as $row) {
         $rowData = [];
